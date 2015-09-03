@@ -1,8 +1,14 @@
 <ion-view view-title="My stocks">
   <ion-content>
     <ion-list>
-      <ion-item ng-repeat="arbitraryItemInstanceName in playlists" ng-href="#/app/playlists/{{arbitraryItemInstanceName.id}}">
-       {{arbitraryItemInstanceName.title}}
+      <ion-item ng-repeat="stock in myStocksArray track by stock.ticker" ng-href="#/app/{{stock.ticker}}">
+       <div class="row row-center">
+         <div class="col">
+           <h3>
+             {{stock.ticker}}
+           </h3>
+         </div>
+       </div>
       </ion-item>
     </ion-list>
   </ion-content>
