@@ -6,6 +6,8 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('market', [
   'ionic',
+  'nvd3',
+  'nvChart',
   'market.controllers',
   'market.services',
   'market.filters',

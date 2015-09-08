@@ -62,8 +62,37 @@ angular.module('market.services',[])
       return deferred.promise;
   };
 
+
+
   return {
     getPriceData: getPriceData,
     getDetailsData: getDetailsData
   };
+})
+
+.factory('chartDataService', function ($q, encodeURIService, $http){
+
+  var getHistoricalData= function(ticker, fromDate, todayDate) {
+    var deferred = $q.defer(),
+    query = 'select * from yahoo.finance.historicaldata where symbol = "'+ ticker +'" and startDate = "'+ fromDate +'" and endDate = "'+ todayDate +'"' ,
+    url ='http://query.yahooapis.com/v1/public/yql?q=' + encodeURIService.encode(query) + '&format=json&env=http://datatables.org/alltables.env';
+
+    $http.get(url)
+      .success(function(json){
+        console.log(json);
+        var jsonData = json;
+        deferred.resolve(jsonData);
+      })
+      .error(function(error){
+        console.log("chart data error: " + error);
+        deferred.reject();
+      });
+
+    return deferred.promise;
+  };
+
+  return {
+    getHistoricalData: getHistoricalData
+  };
+
 });
