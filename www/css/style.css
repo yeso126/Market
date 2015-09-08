@@ -1,3 +1,29 @@
+/*Stock-subheader bar*/
+
+/**/
+/**/Aqui quede
+/**/
+
+/*Short-bar*/
+
+#short-button-bar .button {
+  line-height:normal;
+  min-height: 10px;
+  border: none;
+  border-radius: 0;
+  font-size: 9pt;
+  background-color: #fff;
+}
+
+#short-button-bar .button.active {
+  font-weight:bold;
+}
+#short-button-bar{
+  -webkit-box-shadow: 0px 0px 0px 1px #ddd;
+}
+
+
+
 /*Chart Styles*/
 #interactiveChart {
   height: 80vmin;
@@ -91,6 +117,16 @@
   shape-rendering: crispEdges;
   stroke-width: 1;
   stroke: #ccc;
+}
+
+
+/*helper*/
+
+.display-flex{
+  display: flex !important;
+}
+.no-margin{
+  margin:0 !important;
 }
 
 /*Adjustment Styles*/

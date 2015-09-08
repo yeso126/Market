@@ -1,18 +1,18 @@
 <ion-view view-title="{{ticker}}" drag-content="false">
 
-  <div class="bar bar-subheader bar-light">
+  <div class="bar bar-subheader bar-light" id="stock-subheader-bar" >
 
     <div class="buttons" side="left">
-      <div class="button button-clear">
-        <h6>{{stockDetailsData.Name}}</h6>
+      <div class="button button-clear display-flex">
+        <h6 id="stock-name" >{{stockDetailsData.Name}}</h6>
       </div>
     </div>
 
-  <h2 class="title button-left button-right">{{stockPriceData.price | shrinkNumber:2}}</h2>
+  <h2 class="title button-left button-right" id="stock-price">{{stockPriceData.price | shrinkNumber:2}}</h2>
 
     <div class="buttons" side="right">
       <div class="button button-clear">
-        <h6>{{stockPriceData.chg_percent | number:3}}%</h6>
+        <h6 id="stock-change" ng-class="stockPriceData.change < 0 ? 'assertive' : 'balanced' "> <span ng-if="stockPriceData.change > 0 ">+</span> {{stockPriceData.change | shrinkNumber:2}}<br>( <span ng-if="stockPriceData.change > 0 ">+</span>{{stockPriceData.chg_percent | number:3}}%)</h6>
       </div>
     </div>
 
