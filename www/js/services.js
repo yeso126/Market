@@ -114,7 +114,6 @@ angular.module('market.services',[])
             '"values":' + '[' + priceData + ']' +
           '}]';
 
-              console.log(formattedChartData);
         deferred.resolve(formattedChartData);
       })
       .error(function(error){
