@@ -79,9 +79,43 @@ angular.module('market.services',[])
 
     $http.get(url)
       .success(function(json){
-        console.log(json);
-        var jsonData = json;
-        deferred.resolve(jsonData);
+        var jsonData = json.query.results.quote;
+
+        var priceData=[],
+        volumeData = [];
+
+        jsonData.forEach(function(dayDataObject){
+
+          var dateToMillis = dayDataObject.Date,
+          date = Date.parse(dateToMillis),
+          price= parseFloat(Math.round(dayDataObject.Close * 100) / 100).toFixed(3),
+          volume = dayDataObject.Volume,
+
+          volumeDatum = '[' + date + ',' + volume + ']',
+
+          priceDatum = '[' + date + ',' + price + ']';
+
+
+
+          volumeData.unshift(volumeDatum);
+          priceData.unshift(priceDatum);
+
+
+        });
+
+        var formattedChartData =
+        '[{' +
+          '"key":' + '"volume",' +
+          '"bar":' + 'true,' +
+          '"values":' + '[' + volumeData + ']' +
+        '},' +
+        '{' +
+            '"key":' + '"' + ticker + '",' +
+            '"values":' + '[' + priceData + ']' +
+          '}]';
+
+              console.log(formattedChartData);
+        deferred.resolve(formattedChartData);
       })
       .error(function(error){
         console.log("chart data error: " + error);
