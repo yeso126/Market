@@ -66,24 +66,99 @@ angular.module('market.controllers', [])
   'stockDataService',
   'dateService',
   'chartDataService',
+  '$ionicPopup',
+  'notesService',
 
-
- function($scope, $stateParams, $window, stockDataService, dateService, chartDataService) {
+ function(
+   $scope,
+   $stateParams,
+   $window,
+   stockDataService,
+   dateService,
+   chartDataService,
+   $ionicPopup,
+   notesService) {
    $scope.ticker = $stateParams.stockTicker;
    $scope.chartview = 4;
    $scope.oneYearAgoDate = dateService.oneYearAgoDate();
    $scope.todayDate = dateService.currentDate();
-
+   $scope.stockNotes = [];
 
    $scope.$on("$ionicView.afterEnter", function() {
      getPriceData();
      getDetailsData();
      getChartData();
+     $scope.stockNotes= notesService.getNotes($scope.ticker);
    });
 
    $scope.chartViewFunc = function(n) {
      $scope.chartview = n;
    };
+
+
+   $scope.addNote = function() {
+    $scope.note = {title: 'note', body: '', date: $scope.todayDate, ticker: $scope.ticker};
+
+    var note = $ionicPopup.show({
+      template: '<input type="text" ng-model="note.title" id="stock-note-title"><textarea type="text" ng-model="note.body" id="stock-note-title"></textarea> ',
+      title: 'New Note for: ' + $scope.ticker,
+      scope: $scope,
+      buttons: [
+        { text: 'Cancel',
+      onTap: function(e){
+        return;
+      }
+    },
+        {
+          text: '<b>Save</b>',
+          type: 'button-balanced',
+          onTap: function(e) {
+            notesService.addNote($scope.ticker,$scope.note);
+          }
+        }
+      ]
+    });
+    note.then(function(res) {
+      $scope.stockNotes = notesService.getNotes($scope.ticker);
+    });
+  };
+
+  $scope.openNote = function(index, title, body) {
+   $scope.note = {title: title, body: body, date: $scope.todayDate, ticker: $scope.ticker};
+
+   var note = $ionicPopup.show({
+     template: '<input type="text" ng-model="note.title" id="stock-note-title"><textarea type="text" ng-model="note.body" id="stock-note-title"></textarea> ',
+     title: $scope.note.title,
+     scope: $scope,
+     buttons: [
+       {
+         text: 'delete',
+         type: 'button-assertive button-small',
+         onTap: function(e){
+           notesService.deleteNote($scope.ticker, index);
+         }
+       },
+       { text: 'Cancel',
+       type: 'button-small',
+       onTap: function(e){
+         return;
+     }
+   },
+       {
+         text: '<b>Save</b>',
+         type: 'button-balanced button-small',
+         onTap: function(e) {
+           notesService.deleteNote($scope.ticker,index);
+           notesService.addNote($scope.ticker,$scope.note);
+         }
+       }
+     ]
+   });
+   note.then(function(res) {
+     $scope.stockNotes = notesService.getNotes($scope.ticker);
+   });
+ };
+
 
    function getPriceData () {
      var promise = stockDataService.getPriceData($scope.ticker);

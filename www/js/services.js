@@ -44,24 +44,49 @@ angular.module('market.services',[])
   return chartDataCache;
 })
 
+.factory('stockDetailsCacheService', function(CacheFactory){
+  var stockDetailsCache;
 
-.factory('stockDataService', function($q, $http, encodeURIService){
+  if(!CacheFactory.get('stockDetailsCache')){
+    stockDetailsCache = CacheFactory('stockDetailsCache', {
+      maxAge: 60 * 60 * 8 * 1000,
+      deleteOnExpire: 'aggressive',
+      storageMode: 'localStorage'
+    });
+  }
+  else {
+    stockDetailsCache = CacheFactory.get('stockDetailsCache');
+  }
+  return stockDetailsCache;
+})
+
+.factory('stockDataService', function($q, $http, encodeURIService, stockDetailsCacheService){
 
   var getDetailsData = function(ticker) {
     var deferred = $q.defer(),
+
+    cacheKey= ticker,
+    stockDetailsCache= stockDetailsCacheService.get(cacheKey),
+
     query = 'select * from yahoo.finance.quotes where symbol IN ("' + ticker + '")',
     url ='http://query.yahooapis.com/v1/public/yql?q=' + encodeURIService.encode(query) + '&format=json&env=http://datatables.org/alltables.env';
     console.log(url);
 
-    $http.get(url)
-    .success(function(json) {
-      var jsonData = json.query.results.quote;
-      deferred.resolve(jsonData);
-    })
-    .error(function(){
-      console.log("Details data error: " + error);
-      deferred.reject();
-    });
+    if(stockDetailsCache){
+      deferred.resolve(stockDetailsCache);
+    }
+    else {
+      $http.get(url)
+      .success(function(json) {
+        var jsonData = json.query.results.quote;
+        deferred.resolve(jsonData);
+        stockDetailsCacheService.put(cacheKey, jsonData);
+      })
+      .error(function(){
+        console.log("Details data error: " + error);
+        deferred.reject();
+      });
+    }
     return deferred.promise;
 
   };
@@ -156,4 +181,47 @@ angular.module('market.services',[])
     getHistoricalData: getHistoricalData
   };
 
+})
+
+.factory('notesCacheService', function(CacheFactory){
+  var notesCache;
+
+  if(!CacheFactory.get('notesCache')){
+    notesCache= CacheFactory('notesCache',{
+      storageMode: 'localStorage'
+    });
+  }
+  else {
+    notesCache = CacheFactory.get('notesCache');
+  }
+
+  return notesCache;
+})
+
+.factory('notesService',function(notesCacheService){
+
+  return {
+    getNotes: function(ticker){
+      return notesCacheService.get(ticker);
+    },
+    addNote: function(ticker, note){
+      var stockNotes= [];
+      if(notesCacheService.get(ticker)){
+        stockNotes = notesCacheService.get(ticker);
+        stockNotes.push(note);
+      }
+      else {
+        stockNotes.push(note);
+      }
+      notesCacheService.put(ticker,stockNotes);
+    },
+    deleteNote: function(ticker,index){
+
+      var stockNotes = [];
+      stockNotes = notesCacheService.get(ticker);
+      stockNotes.splice(index,1);
+      notesCacheService.put(ticker, stockNotes);
+
+    }
+  };
 });
