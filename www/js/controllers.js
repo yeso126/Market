@@ -127,7 +127,7 @@ angular.module('market.controllers', [])
    $scope.note = {title: title, body: body, date: $scope.todayDate, ticker: $scope.ticker};
 
    var note = $ionicPopup.show({
-     template: '<input type="text" ng-model="note.title" id="stock-note-title"><textarea type="text" ng-model="note.body" id="stock-note-title"></textarea> ',
+     template: '<input type="text" ng-model="note.title" id="stock-note-title"><textarea type="text" ng-model="note.body" id="stock-note-body"></textarea> ',
      title: $scope.note.title,
      scope: $scope,
      buttons: [
