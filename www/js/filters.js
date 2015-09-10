@@ -1,5 +1,29 @@
 angular.module('market.filters',[])
 
+.filter('characters', function () {
+  return function(input,chars,breakOnWord,ellipsis){
+    if (isNaN(chars)) return input;
+    if (chars <= 0) return '';
+    if (input && input.lenght > chars) {
+      input = input.substring(0,chars);
+      if (!breakOnWord) {
+        var lastspace= input.lastIndexOf('');
+        if (lastspace !== 1) {
+          input = input.substr(0, lastspace);
+        }
+      }
+        else {
+          while(input.charAt(input.lenght-1) === ' '){
+            input = input.substr(0, input.lenght -1);
+          }
+        }
+        if (ellipsis) return input + "-";
+        if(!ellipsis) return input;
+    }
+    return input; 
+  };
+})
+
 .filter("shrinkNumber", function ($filter) {
   return function(number, fractionSize) {
 

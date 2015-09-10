@@ -9,6 +9,7 @@ angular.module('market', [
   'angular-cache',
   'nvd3',
   'nvChart',
+  'cb.x2js',
   'market.controllers',
   'market.services',
   'market.filters',
