@@ -41,22 +41,10 @@ angular.module('market.controllers', [])
   };
 })
 
-.controller('MyStocksCtrl', ['$scope',
- function($scope) {
-  $scope.myStocksArray = [
-    {ticker: "AAPL"},
-    {ticker: "GPRO"},
-    {ticker: "FB"},
-    {ticker: "NFLX"},
-    {ticker: "TSLA"},
-    {ticker: "BRK-A"},
-    {ticker: "INTC"},
-    {ticker: "MSFT"},
-    {ticker: "GE"},
-    {ticker: "BAC"},
-    {ticker: "C"},
-    {ticker: "T"},
-  ];
+.controller('MyStocksCtrl', ['$scope', 'myStocksArrayService',
+ function($scope, myStocksArrayService) {
+  $scope.myStocksArray = myStocksArrayService;
+  console.log(myStocksArrayService);
 }])
 
 .controller('StockCtrl',[
@@ -69,6 +57,7 @@ angular.module('market.controllers', [])
   '$ionicPopup',
   'notesService',
   'newsService',
+  'followStockService',
 
  function(
    $scope,
@@ -79,12 +68,15 @@ angular.module('market.controllers', [])
    chartDataService,
    $ionicPopup,
    notesService,
-   newsService) {
+   newsService,
+   followStockService) {
    $scope.ticker = $stateParams.stockTicker;
    $scope.chartview = 4;
    $scope.oneYearAgoDate = dateService.oneYearAgoDate();
    $scope.todayDate = dateService.currentDate();
    $scope.stockNotes = [];
+   $scope.following= followStockService.checkFollowing($scope.ticker);
+
 
    $scope.$on("$ionicView.afterEnter", function() {
      getPriceData();
@@ -98,6 +90,17 @@ angular.module('market.controllers', [])
      $scope.chartview = n;
    };
 
+
+   $scope.toggleFollow = function () {
+     if ($scope.following) {
+       followStockService.unfollow($scope.ticker);
+       $scope.following = false;
+     }
+     else {
+       followStockService.follow($scope.ticker);
+       $scope.following = true;
+     }
+   };
 
    $scope.addNote = function() {
     $scope.note = {title: 'note', body: '', date: $scope.todayDate, ticker: $scope.ticker};
@@ -174,10 +177,10 @@ angular.module('market.controllers', [])
 
        $scope.stockPriceData = data;
        if(data.chg_percent >= 0 && data !==null) {
-         $scope.reactiveColor = {'background-color': '#33cd5f'};
+         $scope.reactiveColor = {'background-color': '#33cd5f', 'border-color': 'rgba(255,255,255,.3)'};
        }
        else if(data.chg_percent < 0 && data !== null) {
-         $scope.reactiveColor = {'background-color': '#ef473a'};
+         $scope.reactiveColor = {'background-color': '#ef473a', 'border-color': 'rgba(0,0,0,.2)'};
        }
 
      });
