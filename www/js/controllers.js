@@ -13,6 +13,7 @@ function($scope, modalService) {
   console.log(myStocksArrayService);
 }])
 
+
 .controller('StockCtrl',[
   '$scope',
   '$stateParams',
@@ -242,5 +243,31 @@ function($scope, modalService) {
 	};
 
 
+
+}])
+
+.controller('SearchCtrl', ['$scope', 'modalService', 'searchService', '$state',
+  function ($scope, modalService, searchService, $state ){
+
+    $scope.closeModal = function () {
+      modalService.closeModal();
+    };
+
+    $scope.search = function () {
+      $scope.searchResults = '';
+      startSearch($scope.searchQuery);
+    };
+
+    var startSearch = ionic.debounce(function(query){
+      searchService.search(query)
+        .then(function(data) {
+          $scope.searchResults = data;
+        });
+    },750);
+
+    $scope.goToStock = function(ticker) {
+      modalService.closeModal();
+      $state.go('app.stock', {stockTicker: ticker});
+    };
 
 }]);
