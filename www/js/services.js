@@ -1,5 +1,7 @@
 angular.module('market.services',[])
 
+.constant('FIREBASE_URL', 'https://stockmarket-testapp.firebaseio.com/')
+
 .factory('encodeURIService', function(){
   return {
     encode: function(string) {
@@ -7,6 +9,73 @@ angular.module('market.services',[])
       return encodeURIComponent(string).replace(/\"/g,"%22").replace(/\ /g,"%20").replace(/[!'()]/g, escape);
     }
   };
+})
+
+.factory('userService', function(firebaseRef, modalService, $rootScope){
+var login = function(user) {
+
+
+  firebaseRef.authWithPassword({
+    email   : user.email,
+    password: user.password
+  }, function(error, authData) {
+    if (error) {
+      console.log('Login failed ! ', error);
+    }
+    else {
+      $rootScope.currentUser = user;
+      modalService.closeModal();
+      console.log("Authenticated successfully with uid", authData);
+    }
+  });
+
+
+};
+
+var signup = function(user) {
+
+firebaseRef.createUser({
+  email   : user.email,
+  password: user.password
+}, function(error, userData) {
+  if (error) {
+    console.log('error creating user:', error);
+  }
+  else {
+    login(user);
+    console.log("Sucessfully created user account with uid", user.uid);
+  }
+});
+
+};
+
+var logout = function () {
+  firebaseRef.unauth();
+  $rootScope.currentUser = '';
+};
+
+var getUser = function() {
+
+  return firebaseRef.getAuth();
+};
+
+if(getUser()){
+  $rootScope.currentUser = getUser();
+}
+
+return {
+  login: login,
+  signup: signup,
+  logout: logout
+};
+})
+
+.factory('firebaseRef', function($firebase, FIREBASE_URL){
+
+  var firebaseRef = new Firebase(FIREBASE_URL);
+
+  return firebaseRef;
+
 })
 
 .factory('dateService', function($filter){
